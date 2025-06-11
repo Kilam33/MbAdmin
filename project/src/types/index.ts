@@ -26,35 +26,48 @@ export interface Hotel {
   name: string;
   type: 'hotel' | 'camp' | 'lodge';
   location: string;
-  image_url?: string;
-  images?: string[];
   description: string;
-  rating: number;
+  rating: number; // numeric(2,1) in schema
   price_range: string;
   glow_color: string;
   contact_phone?: string;
   contact_email?: string;
   booking_link?: string;
-  room_count?: number;
-  review_count?: number;
-  check_in_time?: string;
-  check_out_time?: string;
-  concierge_hours?: string;
-  certification?: string;
-  rating_location?: number;
-  rating_service?: number;
-  rating_cleanliness?: number;
-  rating_comfort?: number;
-  rating_value?: number;
-  highlights?: string[];
-  amenities?: HotelAmenity[];
-  destinations?: Destination[];
+  created_at?: string; // timestamp with time zone
+  updated_at?: string; // timestamp with time zone - should be present due to trigger
+  
+  // Image fields
+  image_url?: string;
+  images?: string[]; // text[] in schema
+  
+  // Hotel details with schema defaults
+  room_count?: number; // default 12
+  review_count?: number; // default 234
+  check_in_time?: string; // default '3:00 PM'
+  check_out_time?: string; // default '11:00 AM'
+  concierge_hours?: string; // default '24/7'
+  certification?: string; // default 'Certified Safari Lodge'
+  
+  // Rating breakdowns (all numeric(2,1) with defaults)
+  rating_location?: number; // default 9.2
+  rating_service?: number; // default 9.0
+  rating_cleanliness?: number; // default 8.8
+  rating_comfort?: number; // default 9.1
+  rating_value?: number; // default 8.9
+  
+  // Text arrays
+  highlights?: string[]; // text[] in schema
+  location_highlights?: string[]; // text[] in schema - MISSING in original types
+  
+  // JSONB fields - stored as JSON in database
+  amenities?: any[]; // jsonb default '[]' - simplified from HotelAmenity[]
+  destinations?: any[]; // jsonb default '[]' - simplified from Destination[]
+  
+  // Fields in original types but NOT in schema - consider removing or adding to schema
   room_types?: RoomType[];
   safari_experiences?: SafariExperience[];
   nearby_attractions?: NearbyAttraction[];
   special_offers?: SpecialOffer[];
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface Destination {
@@ -177,6 +190,7 @@ export interface User {
   email: string;
   created_at?: string;
   last_sign_in_at?: string;
+  banned_until?: string;
   user_metadata?: {
     full_name?: string;
     name?: string;

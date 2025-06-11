@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         {!isCollapsed && (
-          <h1 className="text-lg font-semibold">Safari Admin</h1>
+          <h1 className="text-lg font-semibold">MB Admin Panel</h1>
         )}
         <button
           onClick={onToggle}

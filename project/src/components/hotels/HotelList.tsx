@@ -20,6 +20,44 @@ export const HotelList: React.FC<HotelListProps> = ({
   const [typeFilter, setTypeFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
 
+  // Helper function to safely parse images
+  const getHotelImages = (hotel: Hotel): string[] => {
+    if (hotel.images) {
+      // If images is already an array, return it
+      if (Array.isArray(hotel.images)) {
+        return hotel.images;
+      }
+      // If images is a string (JSON), try to parse it
+      if (typeof hotel.images === 'string') {
+        try {
+          const parsed = JSON.parse(hotel.images);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          console.warn('Failed to parse hotel images:', error);
+          return [];
+        }
+      }
+    }
+    return [];
+  };
+
+  // Helper function to get the first image URL
+  const getFirstImageUrl = (hotel: Hotel): string => {
+    // Try image_url first
+    if (hotel.image_url) {
+      return hotel.image_url;
+    }
+    
+    // Try to get first image from images array
+    const images = getHotelImages(hotel);
+    if (images.length > 0) {
+      return images[0];
+    }
+    
+    // Fallback to placeholder
+    return '/placeholder-hotel.jpg';
+  };
+
   const filteredHotels = hotels.filter(hotel => {
     const matchesSearch = hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          hotel.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -89,15 +127,26 @@ export const HotelList: React.FC<HotelListProps> = ({
           <div key={hotel.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="relative">
               <img
-                src={hotel.image_url}
+                src={getFirstImageUrl(hotel)}
                 alt={hotel.name}
                 className="w-full h-48 object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder-hotel.jpg';
+                }}
               />
               <div className="absolute top-2 right-2">
                 <span className="bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
                   {hotel.price_range}
                 </span>
               </div>
+              {/* Show image count if multiple images available */}
+              {getHotelImages(hotel).length > 1 && (
+                <div className="absolute top-2 left-2">
+                  <span className="bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
+                    +{getHotelImages(hotel).length - 1} more
+                  </span>
+                </div>
+              )}
             </div>
             
             <div className="p-4">
@@ -107,7 +156,9 @@ export const HotelList: React.FC<HotelListProps> = ({
                 </h3>
                 <div className="flex items-center">
                   <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                  <span className="ml-1 text-sm text-gray-600">{hotel.rating}</span>
+                  <span className="ml-1 text-sm text-gray-600">
+                    {hotel.rating?.toFixed(1) || 'N/A'}
+                  </span>
                 </div>
               </div>
               
@@ -119,6 +170,38 @@ export const HotelList: React.FC<HotelListProps> = ({
               <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                 {hotel.description}
               </p>
+
+              {/* Display highlights from schema */}
+              {hotel.highlights && hotel.highlights.length > 0 && (
+                <div className="mb-3">
+                  <div className="flex flex-wrap gap-1">
+                    {hotel.highlights.slice(0, 2).map((highlight, index) => (
+                      <span
+                        key={index}
+                        className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                      >
+                        {highlight}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Display location highlights */}
+              {hotel.location_highlights && hotel.location_highlights.length > 0 && (
+                <div className="mb-3">
+                  <div className="flex flex-wrap gap-1">
+                    {hotel.location_highlights.slice(0, 2).map((highlight, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                      >
+                        📍 {highlight}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className="flex items-center justify-between text-sm mb-4">
                 <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs capitalize">
@@ -128,6 +211,16 @@ export const HotelList: React.FC<HotelListProps> = ({
                   {hotel.contact_phone && <Phone className="h-4 w-4" />}
                   {hotel.contact_email && <Mail className="h-4 w-4" />}
                 </div>
+              </div>
+
+              {/* Display room count and review count from schema */}
+              <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                {hotel.room_count && (
+                  <span>{hotel.room_count} rooms</span>
+                )}
+                {hotel.review_count && (
+                  <span>{hotel.review_count} reviews</span>
+                )}
               </div>
               
               <div className="flex space-x-2">
@@ -158,6 +251,13 @@ export const HotelList: React.FC<HotelListProps> = ({
       {filteredHotels.length === 0 && !loading && (
         <div className="text-center py-12">
           <p className="text-gray-500">No hotels found matching your criteria.</p>
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="text-gray-500 mt-2">Loading hotels...</p>
         </div>
       )}
     </div>

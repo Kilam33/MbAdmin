@@ -23,6 +23,21 @@ export const DestinationList: React.FC<DestinationListProps> = ({
     destination.tagline.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Helper function to safely render features
+  const renderFeature = (feature: any, index: number) => {
+    // Handle both string and object formats
+    const featureText = typeof feature === 'string' ? feature : feature?.text || feature?.value || 'Unknown feature';
+    
+    return (
+      <span
+        key={index}
+        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800"
+      >
+        {featureText}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Search */}
@@ -50,6 +65,9 @@ export const DestinationList: React.FC<DestinationListProps> = ({
                 src={destination.image_url}
                 alt={destination.name}
                 className="w-full h-48 object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://via.placeholder.com/400x200?text=Image+Not+Found';
+                }}
               />
               <div 
                 className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"
@@ -69,18 +87,19 @@ export const DestinationList: React.FC<DestinationListProps> = ({
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-900 mb-2">Key Features:</h4>
                 <div className="flex flex-wrap gap-1">
-                  {destination.key_features.slice(0, 3).map((feature, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800"
-                    >
-                      {feature}
-                    </span>
-                  ))}
-                  {destination.key_features.length > 3 && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-                      +{destination.key_features.length - 3} more
-                    </span>
+                  {destination.key_features && destination.key_features.length > 0 ? (
+                    <>
+                      {destination.key_features.slice(0, 3).map((feature, index) => 
+                        renderFeature(feature, index)
+                      )}
+                      {destination.key_features.length > 3 && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                          +{destination.key_features.length - 3} more
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-xs text-gray-500 italic">No features listed</span>
                   )}
                 </div>
               </div>
@@ -124,6 +143,12 @@ export const DestinationList: React.FC<DestinationListProps> = ({
       {filteredDestinations.length === 0 && !loading && (
         <div className="text-center py-12">
           <p className="text-gray-500">No destinations found matching your criteria.</p>
+        </div>
+      )}
+      
+      {loading && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">Loading destinations...</p>
         </div>
       )}
     </div>

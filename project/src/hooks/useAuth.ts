@@ -64,12 +64,6 @@ export const useAuth = () => {
   const isAdmin = () => {
     if (!user) return false;
     
-    // Debug log to see the actual user structure
-    console.log('Checking admin status for user:', {
-      email: user.email,
-      app_metadata: user.app_metadata,
-      user_metadata: user.user_metadata
-    });
     
     // Check multiple possible admin indicators
     return (

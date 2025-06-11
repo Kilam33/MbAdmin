@@ -8,7 +8,10 @@ import { Dashboard } from './pages/Dashboard';
 import { PackagesPage } from './pages/PackagesPage';
 import { HotelsPage } from './pages/HotelsPage';
 import { DestinationsPage } from './pages/DestinationsPage';
+import { BookingsPage } from './pages/BookingsPage';
+import { InquiriesPage } from './pages/InquiriesPage';
 import { ReviewsPage } from './pages/ReviewsPage';
+import { UsersPage } from './pages/UsersPage';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -37,10 +40,10 @@ const AppRoutes: React.FC = () => {
         <Route path="packages" element={<PackagesPage />} />
         <Route path="hotels" element={<HotelsPage />} />
         <Route path="destinations" element={<DestinationsPage />} />
-        <Route path="bookings" element={<div className="p-6">Bookings Page (Coming Soon)</div>} />
-        <Route path="inquiries" element={<div className="p-6">Inquiries Page (Coming Soon)</div>} />
+        <Route path="bookings" element={<BookingsPage />} />
+        <Route path="inquiries" element={<InquiriesPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
-        <Route path="users" element={<div className="p-6">Users Page (Coming Soon)</div>} />
+        <Route path="users" element={<UsersPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/admin" replace />} />
     </Routes>
